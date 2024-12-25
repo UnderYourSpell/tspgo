@@ -9,10 +9,6 @@ import (
 // V is the new path
 // add to U
 
-func remove(slice []City, s int) []City {
-	return append(slice[:s], slice[s+1:]...)
-}
-
 func findDist(city1 City, city2 City) float64 {
 	x1 := city1.x
 	y1 := city1.y

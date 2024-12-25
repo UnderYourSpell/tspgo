@@ -10,6 +10,11 @@ TODO
 1. Nearest Neighbor - DONE
 2. Roulette Wheel - DONE
 3. Edge Recombination
+
+DONE ERX
+But need to make sure it is working properly...I think it is I am not sure though, will need
+to do a PyGame Visualization to check things
+
 4. Partially Mapped Crossover
 */
 
@@ -20,19 +25,32 @@ import (
 	"time"
 )
 
+func remove(slice []City, s int) []City {
+	return append(slice[:s], slice[s+1:]...)
+}
+
 func main() {
-	const maxGens = 3000
-	const popSize = 128
+	const maxGens = 1500
+	const popSize = 32
 	const mutateRate = 0.8
 	const elitism = 2
 	const nn = 1
 	selection := "LRS"
+	crossover := "ERX"
 
 	//read in file
 	fp := "./tsp/eil51.tsp"
 	data := readEucTSPFile(fp)
 	initCities := data.initCities
 	numCities := data.dimension
+
+	//only used in ERX
+	cityMap := make(map[string]City)
+	if crossover == "ERX" {
+		for i := 0; i < numCities; i++ {
+			cityMap[initCities[i].id] = initCities[i]
+		}
+	}
 
 	var genePool []Trip
 
@@ -63,7 +81,7 @@ func main() {
 		}
 	}
 
-	start := time.Now() //start the clock
+	start := time.Now() //start the clock - this is the meat of thw algorithm, everything else was set up
 	//main loop
 	for p := 0; p < maxGens; p++ {
 		var parents []Trip
@@ -76,8 +94,18 @@ func main() {
 		}
 		//SPX
 		var children []Trip
-		for i := 0; i < popSize/2; i += 2 {
-			SPX(&parents[i], &parents[i+1], &children, numCities)
+		//change this for SPX!! and ERX, testing for now
+		if crossover == "SPX" {
+			for i := 0; i < popSize/2; i += 2 {
+				SPX(&parents[i], &parents[i+1], &children, numCities)
+			}
+		} else if crossover == "ERX" {
+			for i := 0; i < popSize/2; i += 2 {
+				EdgeRecombination(&parents[i], &parents[i+1], &children, &cityMap, numCities)
+			}
+			for i := 0; i+1 < popSize/2; i += 2 {
+				EdgeRecombination(&parents[i], &parents[i+1], &children, &cityMap, numCities)
+			}
 		}
 
 		//for children mutate given a threshold
