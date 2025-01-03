@@ -143,7 +143,7 @@ func EdgeRecombination(gene1 *Trip, gene2 *Trip, children *[]Trip, cityMap *map[
 						break
 					}
 				}
-				if found == 0 { //if not found!
+				if found == 0 { //if not found then add
 					NStar = (*cityMap)[cityName]
 					break
 				}
