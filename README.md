@@ -8,4 +8,5 @@ This Go implementation builds on my C++ implementation and I hope to explore thi
 Currently, the only algorithm working is the Genetic Algorithm (GA). In main.go, type the name of the problem and adjust paramaters. 
 
 ### Christofides
-Work in Progress...
+Christofides Heauristic mostly done.
+Simulated Annealing with 2opt swap will be next addition
