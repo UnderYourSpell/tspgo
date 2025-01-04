@@ -7,8 +7,8 @@ import (
 	"strconv"
 )
 
-func treeOutput(tree []Edge) {
-	fo, err := os.Create("tree.txt")
+func treeOutput(tree []Edge, outfile string) {
+	fo, err := os.Create(outfile)
 	if err != nil {
 		panic(err)
 	}

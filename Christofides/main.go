@@ -1,7 +1,7 @@
 package main
 
 /*
-Prim's Algorithm to create a Minimum Spanning Tree on a TSP in Go
+Christofides
 */
 
 import (
@@ -12,16 +12,10 @@ import (
 	"time"
 )
 
-type Graph struct {
-	weight   float64
-	vertices []Node
-}
-
 type Node struct {
 	x     float64
 	y     float64
 	id    string
-	cons  int
 	edges []Edge
 }
 
@@ -66,7 +60,7 @@ func createEdges(nodes []Node) map[string][]Edge {
 func main() {
 	//step 1. create a graph with all edges in the tree
 	//read in file
-	fp := "./tsp/fnl4461.tsp"
+	fp := "./tsp/original10.tsp"
 	data := readEucTSPFile(fp)
 
 	//create list of edges and weights
@@ -85,7 +79,7 @@ func main() {
 	Vset[nodes[0].id] = true
 
 	//Create MST
-	startTreeCreate := time.Now() //start the clock - this is the meat of thw algorithm, everything else was set up
+	start := time.Now() //start the clock for the tree - this is the meat of thw algorithm, everything else was set up
 	var tree []Edge
 	for j := 0; j < numCities; j++ {
 		if len(V) == numCities {
@@ -116,11 +110,113 @@ func main() {
 		Vset[bestEdge.dest.id] = true
 	}
 
-	elapsedTree := time.Since(startTreeCreate)
-	fmt.Printf("Runtime Create MST: %s\n", elapsedTree)
+	/*
+		Create Minimum Cost Perfect Matching
+		Edges added to Tree and graph map
+	*/
 
-	//Now we do Matching
-	//First we need to track connections
-	//Should create a string map to a node to track its information
-	//can have edges associated with the node
+	//Add odd Vertices to an Array
+	var oddVertices []Node
+	oddSet := make(map[string]bool)
+	for i := range numCities {
+		id := nodes[i].id
+		node := graph[id]
+		if len(node.edges)%2 == 0 {
+			oddVertices = append(oddVertices, nodes[i])
+			oddSet[nodes[i].id] = true
+		}
+	}
+
+	//Search edges of odd vertices that connect to other odd vertices and add the closest one
+	//Part of the reason we don't do much searching here is because all the edges are already sorted in ascending order
+	//so the search is pretty fast, it will always find the closest odd Vertex
+	for i := range oddVertices {
+		originNode := oddVertices[i]
+		searchEdges := edges[oddVertices[i].id]
+		for j := range searchEdges {
+			destID := searchEdges[j].dest.id //ID of destination edge in set of all possible edges from originNode
+			_, ok := oddSet[destID]
+			if ok {
+				//if destination in odd set
+				newEdge := Edge{
+					origin: originNode,
+					dest:   searchEdges[j].dest,
+					wt:     calcDistance(originNode, searchEdges[j].dest),
+					index:  0,
+				}
+				//lets add the edge to the tree for visualization purposes
+				tree = append(tree, newEdge)
+				originNode.edges = append(originNode.edges, newEdge) //add edge to new Node
+				graph[originNode.id] = originNode                    //update edges for source Node to the graph
+				//delete both from Oddset - cannot be used
+				delete(oddSet, originNode.id)
+				delete(oddSet, searchEdges[j].dest.id)
+				break
+			}
+		}
+
+	}
+
+	//its not minimum weight lol
+	//have a multigraph with duplicate edges, all vertices are of even degree
+	//take the Eulerian tour
+	//traverse vertices visit only once
+
+	//need an order of vertices from the tree edges
+	//create an order of nodes
+	var nodeOrder []Node
+	nodeOrder = append(nodeOrder, tree[0].origin, tree[0].dest) //add the first two in the tree
+	for i := 1; i < len(tree); i++ {
+		nodeOrder = append(nodeOrder, tree[i].dest) //for all others add the destination
+	}
+
+	visited := make(map[string]bool)
+	var finalGraph []Edge
+	//we always visit the first guy
+	firstEdge := Edge{
+		origin: nodeOrder[0],
+		dest:   nodeOrder[1],
+		wt:     calcDistance(nodeOrder[0], nodeOrder[1]),
+		index:  0,
+	}
+	finalGraph = append(finalGraph, firstEdge)
+	visited[nodeOrder[1].id] = true
+
+	for i := 2; i < len(nodeOrder); i++ {
+		_, ok := visited[nodeOrder[i].id]
+		if !ok { //if not visited
+			//add the edge and mark visited
+			newEdge := Edge{
+				origin: nodeOrder[i-1],
+				dest:   nodeOrder[i],
+				wt:     calcDistance(nodeOrder[i-1], nodeOrder[i]),
+				index:  0,
+			}
+			finalGraph = append(finalGraph, newEdge)
+			visited[nodeOrder[i].id] = true
+		}
+	}
+
+	lastEdge := Edge{
+		origin: finalGraph[len(finalGraph)-1].dest,
+		dest:   nodeOrder[0],
+		wt:     calcDistance(nodeOrder[0], nodeOrder[1]),
+		index:  0,
+	}
+	finalGraph = append(finalGraph, lastEdge)
+
+	//now calculate final path length
+	var pathLength float64
+	for i := range finalGraph {
+		pathLength += finalGraph[i].wt
+	}
+	fmt.Println("Path Length:", pathLength)
+	elapsed := time.Since(start)
+	fmt.Printf("Runtime Create MST: %s\n", elapsed)
+
+	//next step is local search
+	//subsequent graph is 2opt optimal
+	//can use go routines for 2opt to do simulated annealing
+
+	//treeOutput(finalGraph, "graph.txt")
 }
