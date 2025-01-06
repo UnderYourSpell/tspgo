@@ -5,7 +5,7 @@ I enjoyed writing it so I wanted to explore the problem further. I also wanted t
 This Go implementation builds on my C++ implementation and I hope to explore this problem and the algorithms that solve it by using the Go language.
 
 ### Genetic Algorithm
-Currently, the only algorithm working is the Genetic Algorithm (GA). In main.go, type the name of the problem and adjust paramaters. 
-
+The Genetic Algorithm implenetation is complete. Paramaters are adjustable in main.go.
 ### Christofides
-Work in Progress...
+Christofides Heauristic mostly done.
+Simulated Annealing with 2opt swap will be next addition
