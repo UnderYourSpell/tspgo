@@ -32,19 +32,8 @@ func SPX(gene1 *Trip, gene2 *Trip, children *[]Trip, numCities int) {
 		}
 	}
 
-	//need to make some init function for this
-	child1Trip := Trip{
-		path:       child1,
-		pathLength: 0,
-		prob:       0,
-	}
-	child2Trip := Trip{
-		path:       child2,
-		pathLength: 0,
-		prob:       0,
-	}
-	child1Trip.calcPathLength()
-	child2Trip.calcPathLength()
+	child1Trip := createTrip(child1)
+	child2Trip := createTrip(child2)
 	(*children) = append((*children), child1Trip, child2Trip)
 }
 
@@ -151,12 +140,7 @@ func EdgeRecombination(gene1 *Trip, gene2 *Trip, children *[]Trip, cityMap *map[
 		}
 		N = NStar
 	}
-	newTrip := Trip{
-		path:       K,
-		pathLength: 0,
-		prob:       0,
-	}
-	newTrip.calcPathLength()
+	newTrip := createTrip(K)
 	(*children) = append((*children), newTrip)
 }
 

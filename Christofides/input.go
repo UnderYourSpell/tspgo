@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -96,4 +97,31 @@ func readEucTSPFile(fp string) TSPProbelmEUC {
 		initCities:     path,
 	}
 	return data
+}
+
+func createEdges(nodes []Node) map[string][]Edge {
+	//need to create a map with the city id
+	edges := make(map[string][]Edge)
+	for i := range nodes {
+		var curEdges []Edge
+		for j := range nodes {
+			if nodes[i].id == nodes[j].id {
+				continue
+			}
+			//the edge list for each node should be a priority queue this makes lookups faster
+			distance := calcDistance(nodes[i], nodes[j])
+			newEdge := Edge{
+				origin: nodes[i],
+				dest:   nodes[j],
+				wt:     distance,
+				index:  0,
+			}
+			curEdges = append(curEdges, newEdge)
+		}
+		sort.Slice(curEdges, func(i, j int) bool {
+			return curEdges[i].wt < curEdges[j].wt
+		})
+		edges[nodes[i].id] = curEdges
+	}
+	return edges
 }

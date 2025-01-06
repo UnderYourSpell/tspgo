@@ -51,3 +51,13 @@ func (x *Trip) printPath() {
 	}
 	fmt.Println()
 }
+
+func createTrip(path []City) Trip {
+	newTrip := Trip{
+		path:       path,
+		pathLength: 0,
+		prob:       0,
+	}
+	newTrip.calcPathLength()
+	return newTrip
+}

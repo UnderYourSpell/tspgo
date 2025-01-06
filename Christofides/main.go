@@ -8,7 +8,6 @@ import (
 	"container/heap"
 	"fmt"
 	"math"
-	"sort"
 	"time"
 )
 
@@ -30,37 +29,19 @@ func calcDistance(n1 Node, n2 Node) float64 {
 	return math.Sqrt(math.Pow(n2.x-n1.x, 2) + math.Pow(n2.y-n1.y, 2))
 }
 
-func createEdges(nodes []Node) map[string][]Edge {
-	//need to create a map with the city id
-	edges := make(map[string][]Edge)
-	for i := range nodes {
-		var curEdges []Edge
-		for j := range nodes {
-			if nodes[i].id == nodes[j].id {
-				continue
-			}
-			//the edge list for each node should be a priority queue this makes lookups faster
-			distance := calcDistance(nodes[i], nodes[j])
-			newEdge := Edge{
-				origin: nodes[i],
-				dest:   nodes[j],
-				wt:     distance,
-				index:  0,
-			}
-			curEdges = append(curEdges, newEdge)
-		}
-		sort.Slice(curEdges, func(i, j int) bool {
-			return curEdges[i].wt < curEdges[j].wt
-		})
-		edges[nodes[i].id] = curEdges
+func calcPathLength(nodes []Node) float64 {
+	var length float64
+	for i := 0; i < len(nodes)-1; i++ {
+		length += calcDistance(nodes[i], nodes[i+1])
 	}
-	return edges
+	length += calcDistance(nodes[len(nodes)-1], nodes[0])
+	return length
 }
 
 func main() {
 	//step 1. create a graph with all edges in the tree
 	//read in file
-	fp := "./tsp/original10.tsp"
+	fp := "./tsp/eil51.tsp"
 	data := readEucTSPFile(fp)
 
 	//create list of edges and weights
@@ -210,13 +191,27 @@ func main() {
 	for i := range finalGraph {
 		pathLength += finalGraph[i].wt
 	}
-	fmt.Println("Path Length:", pathLength)
-	elapsed := time.Since(start)
-	fmt.Printf("Runtime Create MST: %s\n", elapsed)
+	fmt.Println("Path Length w/o 2opt swap:", pathLength)
 
 	//next step is local search
 	//subsequent graph is 2opt optimal
 	//can use go routines for 2opt to do simulated annealing
+	var path []Node
+	path = append(path, finalGraph[0].origin, finalGraph[0].dest)
+	for i := 1; i < len(finalGraph)-1; i++ {
+		path = append(path, finalGraph[i].dest)
+	}
+	//path is what we send to the simulated annealing portion of this
+
+	//temp := make(chan float64)
+	//temp <- 1
+
+	//need a go routine for each improvement but need the temperature to decrease each time we add a new one
+
+	bestPath := twoOptPathCreateSequential(path)
+	elapsed := time.Since(start)
+	fmt.Println("Final Length with 2opt swap:", calcPathLength(bestPath))
+	fmt.Printf("Runtime: %s\n", elapsed)
 
 	//treeOutput(finalGraph, "graph.txt")
 }

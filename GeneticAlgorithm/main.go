@@ -30,16 +30,16 @@ func remove(slice []City, s int) []City {
 }
 
 func main() {
-	const maxGens = 1500
-	const popSize = 32
+	const maxGens = 500
+	const popSize = 16
 	const mutateRate = 0.8
 	const elitism = 2
 	const nn = 1
 	selection := "LRS"
-	crossover := "ERX"
+	crossover := "SPX"
 
 	//read in file
-	fp := "./tsp/eil51.tsp"
+	fp := "./tsp/original10.tsp"
 	data := readEucTSPFile(fp)
 	initCities := data.initCities
 	numCities := data.dimension

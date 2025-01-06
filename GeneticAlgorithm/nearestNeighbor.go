@@ -58,12 +58,6 @@ func nearestNeighbor(initCities []City) Trip {
 			break
 		}
 	}
-
-	newTrip := Trip{
-		path:       U,
-		pathLength: 0,
-		prob:       0,
-	}
-	newTrip.calcPathLength()
+	newTrip := createTrip(U)
 	return newTrip
 }
