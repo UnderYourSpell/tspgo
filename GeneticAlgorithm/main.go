@@ -30,16 +30,16 @@ func remove(slice []City, s int) []City {
 }
 
 func main() {
-	const maxGens = 500
-	const popSize = 16
+	const maxGens = 1000
+	const popSize = 32
 	const mutateRate = 0.8
 	const elitism = 2
 	const nn = 1
 	selection := "LRS"
-	crossover := "SPX"
+	crossover := "ERX"
 
 	//read in file
-	fp := "./tsp/original10.tsp"
+	fp := "./tsp/eil101.tsp"
 	data := readEucTSPFile(fp)
 	initCities := data.initCities
 	numCities := data.dimension
@@ -138,6 +138,16 @@ func main() {
 	fmt.Printf("Runtime: %s\n", elapsed)
 	fmt.Print("Best Path Found: ")
 	fmt.Print("Length: ", genePool[0].pathLength, " ")
+
+	bestPath := genePool[0].path
+
+	var finalEdges []Edge
+	for i := 0; i < len(bestPath)-1; i++ {
+		newEdge := createEdge(bestPath[i], bestPath[i+1])
+		finalEdges = append(finalEdges, newEdge)
+	}
+	finalEdges = append(finalEdges, createEdge(bestPath[len(bestPath)-1], bestPath[0]))
+	treeOutput(finalEdges, "graph.txt")
 
 	//Generic Print Statment
 	/*

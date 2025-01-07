@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+/*
+	Handles .tsp file input
+*/
+
 type TSPProbelmEUC struct {
 	name           string
 	comment        string

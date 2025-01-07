@@ -7,10 +7,6 @@ import (
 	"strconv"
 )
 
-/*
-	Prints edges to a file for visualization with nx and matplotlib in python
-*/
-
 func treeOutput(tree []Edge, outfile string) {
 	fo, err := os.Create(outfile)
 	if err != nil {

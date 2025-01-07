@@ -61,3 +61,24 @@ func createTrip(path []City) Trip {
 	newTrip.calcPathLength()
 	return newTrip
 }
+
+type Edge struct {
+	origin City
+	dest   City
+	wt     float64
+	index  int
+}
+
+func calcDistance(n1 City, n2 City) float64 {
+	return math.Sqrt(math.Pow(n2.x-n1.x, 2) + math.Pow(n2.y-n1.y, 2))
+}
+
+func createEdge(origin City, dest City) Edge {
+	newEdge := Edge{
+		origin: origin,
+		dest:   dest,
+		wt:     calcDistance(origin, dest),
+		index:  0,
+	}
+	return newEdge
+}

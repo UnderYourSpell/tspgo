@@ -1,7 +1,8 @@
-// This example demonstrates a priority queue built using the heap interface.
 package main
 
-import "container/heap"
+/*
+	Necessary definitions for creating a priority queue of Edges
+*/
 
 // A PriorityQueue implements heap.Interface and holds Items.
 type PriorityQueue []*Edge
@@ -44,27 +45,3 @@ func (pq *PriorityQueue) update(item *Edge, value string, priority int) {
 	heap.Fix(pq, item.index)
 }
 */
-
-func createEdgesPQ(nodes []Node, numCities int) map[string]PriorityQueue {
-	edges := make(map[string]PriorityQueue)
-	for i := range nodes {
-		pq := make(PriorityQueue, numCities-1)
-		indexer := 0
-		for j := range nodes {
-			if nodes[i].id == nodes[j].id {
-				continue
-			}
-			distance := calcDistance(nodes[i], nodes[j])
-			pq[indexer] = &Edge{
-				origin: nodes[i],
-				dest:   nodes[j],
-				wt:     distance,
-				index:  indexer,
-			}
-			indexer++
-		}
-		heap.Init(&pq)
-		edges[nodes[i].id] = pq
-	}
-	return edges
-}
